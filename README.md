@@ -14,3 +14,4 @@
 (1). 在终端进入目录”mips_sc“，输入“make”，在TEMU工程根目录下生成可加载的二进制文件“entry”。
 (2). 在终端退回TEMU工程根目录，输入“make run”，编译temu指令集仿真器并启动。
 (3). 如果需要重新编译和运行temu仿真器源代码，请在TEMU工程根目录下输入“make clean”，然后重复前两步。
+hhhhhhhhhhhhhhhhhhhhhhhhhhhhh
