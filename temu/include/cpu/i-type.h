@@ -3,5 +3,5 @@
 
 make_helper(lui);
 make_helper(ori);
-
+make_helper(addi);
 #endif

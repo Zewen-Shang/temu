@@ -126,3 +126,14 @@ void dram_write(uint32_t addr, size_t len, uint32_t data) {
 		ddr3_write(addr + BURST_LEN, temp + BURST_LEN, mask + BURST_LEN);
 	}
 }
+
+void print_memory(uint32_t addr,size_t size){
+		uint8_t *point = hw_mem;
+		Assert(addr+size < HW_MEM_SIZE, "physical address %x is outside of the physical memory!", addr);
+		point += addr;
+		size_t i;
+		for(i=0;i<size;i++){
+			printf("%2x\n",*point);
+			point++;
+		}
+}

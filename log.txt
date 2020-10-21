@@ -1,0 +1,5 @@
+[./temu/src/monitor/expr.c,85,make_token] match rules[7] = "[0-9]+" at position 0 with len 1: 0
+[./temu/src/monitor/expr.c,85,make_token] match rules[0] = " +" at position 1 with len 1:  
+[./temu/src/monitor/expr.c,85,make_token] match rules[5] = "==" at position 2 with len 2: ==
+[./temu/src/monitor/expr.c,85,make_token] match rules[0] = " +" at position 4 with len 1:  
+[./temu/src/monitor/expr.c,85,make_token] match rules[7] = "[0-9]+" at position 5 with len 1: 0

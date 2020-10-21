@@ -1,6 +1,6 @@
 #include "monitor.h"
+#include "watchpoint.h"
 #include "temu.h"
-
 #include <stdlib.h>
 #include <readline/readline.h>
 #include <readline/history.h>
@@ -8,7 +8,11 @@
 void cpu_exec(uint32_t);
 
 void display_reg();
-
+void display_memory(uint32_t addr,size_t size);
+void display_watchpoint();
+bool delete_watchpoint(int NO);
+uint32_t expr(char *e, bool *success);
+WP *new_wp();
 /* We use the `readline' library to provide more flexibility to read from stdin. */
 char* rl_gets() {
 	static char *line_read = NULL;
@@ -38,14 +42,70 @@ static int cmd_q(char *args) {
 
 static int cmd_help(char *args);
 
+static int cmd_info(char *args){
+	if(args[0] == 'r'){
+		display_reg();
+		return 0;
+	}
+	if(args[0] == 'w'){
+		//display_memory(0,30);
+		display_watchpoint();
+		return 0;
+	}
+	return -1;
+}
+
+static int cmd_p(char *args){
+	bool suc;
+	int ans = expr(args,&suc);
+	if(suc){
+		printf("%x\n", ans);
+		return 0;
+	}else{
+		return -1;
+	}
+}
+
+static int cmd_si(char *args){
+	int steps;
+	sscanf(args, "%d", &steps);
+	cpu_exec(steps);
+	return 0;
+}
+
+static int cmd_w(char *args){
+	WP *wp = new_wp();
+	memcpy(wp->express, args, sizeof(args));
+	bool suc;
+	uint32_t value = expr(args, &suc);
+	if(!suc)
+		return -1;
+	wp->value = value;
+	return 0;
+}
+
+static int cmd_d(char *args){
+	int NO = atoi(args);
+	if(delete_watchpoint(NO)){
+		return 0;
+	}else{
+		return -1;
+	}
+}
+
 static struct {
 	char *name;
 	char *description;
 	int (*handler) (char *);
-} cmd_table [] = {
-	{ "help", "Display informations about all supported commands", cmd_help },
-	{ "c", "Continue the execution of the program", cmd_c },
-	{ "q", "Exit TEMU", cmd_q }
+} cmd_table[] = {
+	{"help", "Display informations about all supported commands", cmd_help},
+	{"c", "Continue the execution of the program", cmd_c},
+	{"q", "Exit TEMU", cmd_q},
+	{"si", "Exec n steps.", cmd_si},
+	{"info", "Display Information", cmd_info},
+	{"p", "Display expression value", cmd_p},
+	{"w", "Add watchpoint", cmd_w},
+	{"d", "Delete watchpoint", cmd_d}
 
 	/* TODO: Add more commands */
 
@@ -94,6 +154,7 @@ void ui_mainloop() {
 		}
 
 		int i;
+
 		for(i = 0; i < NR_CMD; i ++) {
 			if(strcmp(cmd, cmd_table[i].name) == 0) {
 				if(cmd_table[i].handler(args) < 0) { return; }

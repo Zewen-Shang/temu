@@ -2,7 +2,7 @@
 
 uint32_t dram_read(uint32_t, size_t);
 void dram_write(uint32_t, size_t, uint32_t);
-
+void print_memory(uint32_t addr,size_t size);
 /* Memory accessing interfaces */
 
 uint32_t mem_read(uint32_t addr, size_t len) {
@@ -19,3 +19,6 @@ void mem_write(uint32_t addr, size_t len, uint32_t data) {
 	dram_write(addr, len, data);
 }
 
+void display_memory(uint32_t addr,size_t size){
+	print_memory(addr,size);
+}

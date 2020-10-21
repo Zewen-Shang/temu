@@ -1,6 +1,6 @@
 #include "monitor.h"
 #include "helper.h"
-
+#include "watchpoint.h"
 /* The assembly code of instructions executed is only output to the screen
  * when the number of instructions executed is less than this value.
  * This is useful when you use the `si' command.
@@ -8,9 +8,12 @@
  */
 #define MAX_INSTR_TO_PRINT 10
 
+extern WP *head, *free_;
+
 int temu_state = STOP;
 
 void exec(uint32_t);
+uint32_t expr(char *e, bool *success);
 
 char assembly[80];
 char asm_buf[128];
@@ -61,9 +64,25 @@ void cpu_exec(volatile uint32_t n) {
 #endif
 
 		/* TODO: check watchpoints here. */
+		WP *p = head;
+		while (p != NULL)
+		{
+			bool suc;
+			uint32_t value = expr(p->express, &suc);
+			if (value != p->value)
+			{
+				temu_state = STOP;
+				printf("Trigger Watchpoint. Express:%s\n", p->express);
+				p->value = value;
+				break;
+			}
+			p = p->next;
+		}
 
-
-		if(temu_state != RUNNING) { return; }
+		if (temu_state != RUNNING)
+		{
+			return;
+		}
 	}
 
 	if(temu_state == RUNNING) { temu_state = STOP; }
