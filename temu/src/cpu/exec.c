@@ -12,16 +12,16 @@ uint32_t instr;
 
 op_fun opcode_table [64] = {
 /* 0x00 */	_2byte_esc, inv, inv, inv,
-/* 0x04 */	inv, inv, inv, inv,
-/* 0x08 */	addi, inv, inv, inv,
+/* 0x04 */	beq, bne, inv, inv,
+/* 0x08 */	addi, addiu, inv, sltiu,
 /* 0x0c */	inv, ori, inv, lui,
 /* 0x10 */	inv, inv, temu_trap, inv,
 /* 0x14 */	inv, inv, inv, inv,
 /* 0x18 */	inv, inv, inv, inv,
 /* 0x1c */	inv, inv, inv, inv,
-/* 0x20 */	inv, inv, inv, inv,
+/* 0x20 */	lb, inv, inv, lw,
 /* 0x24 */	inv, inv, inv, inv,
-/* 0x28 */	inv, inv, inv, inv,
+/* 0x28 */	sb, inv, inv, sw,
 /* 0x2c */	inv, inv, inv, inv,
 /* 0x30 */	inv, inv, inv, inv,
 /* 0x34 */	inv, inv, inv, inv,
@@ -30,13 +30,13 @@ op_fun opcode_table [64] = {
 };
 
 op_fun _2byte_opcode_table[64] = {
-	/* 0x00 */ inv, inv, inv, inv,
+	/* 0x00 */ sll, inv, inv, inv,
 	/* 0x04 */ inv, inv, inv, inv,
-	/* 0x08 */ inv, inv, inv, inv,
+	/* 0x08 */ jr, inv, inv, inv,
 	/* 0x0c */ inv, inv, inv, inv,
-	/* 0x10 */ inv, inv, inv, inv,
+	/* 0x10 */ mfhi, inv, mflo, inv,
 	/* 0x14 */ inv, inv, inv, inv,
-	/* 0x18 */ inv, inv, inv, inv,
+	/* 0x18 */ mult, inv, div, inv,
 	/* 0x1c */ inv, inv, inv, inv,
 	/* 0x20 */ add, inv, inv, subu,
 	/* 0x24 */ and, or, xor, nor,

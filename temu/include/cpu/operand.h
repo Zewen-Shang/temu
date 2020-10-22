@@ -8,7 +8,7 @@ enum { OP_TYPE_REG, OP_TYPE_IMM, OP_TYPE_JUMP };
 typedef struct {
 	uint32_t type;
 	union{
-		uint32_t reg;
+		uint32_t reg;  // reg‘s num
 		uint32_t imm;
 		int32_t simm;
 		int32_t instr_index;
@@ -19,7 +19,7 @@ typedef struct {
 typedef struct {
 	uint32_t opcode;
 	uint32_t func;
-	Operand src1, src2, dest;
+	Operand src1, src2, dest, sham;
 } Operands;
 
 #endif

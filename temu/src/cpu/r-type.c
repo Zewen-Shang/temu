@@ -18,14 +18,39 @@ static void decode_r_type(uint32_t instr) {
 
 	op_dest->type = OP_TYPE_REG;
 	op_dest->reg = (instr & RD_MASK) >> (SHAMT_SIZE + FUNC_SIZE);
+
+	op_sham->type = OP_TYPE_IMM;
+	op_sham->imm = instr & SHAMT_MASK;
+	op_sham->val = op_sham->imm;
 }
 
-// make_helper(sll) {
+make_helper(sll) {
 
-// 	decode_r_type(instr);
-// 	reg_w(op_dest->reg) = (op_src1->val + op_src2->val);
-// 	sprintf(assembly, "add   %s,   %s,   %s", REG_NAME(op_dest->reg), REG_NAME(op_src1->reg), REG_NAME(op_src2->reg));
-// }
+	decode_r_type(instr);
+	reg_w(op_dest->reg) = (op_src2->val) << (op_sham->val);
+	sprintf(assembly, "sll   %s,   %s,   0x%04x", REG_NAME(op_dest->reg), REG_NAME(op_src1->reg), op_sham->val);
+}
+
+make_helper(jr) {
+
+	decode_r_type(instr);
+	cpu.pc = op_src1->val;
+	sprintf(assembly, "jr   %s", REG_NAME(op_src1->reg));
+}
+
+make_helper(mfhi) {
+
+	decode_r_type(instr);
+	reg_w(op_dest->reg) = cpu.hi;
+	sprintf(assembly, "mfhi   %s", REG_NAME(op_dest->reg));
+}
+
+make_helper(mflo) {
+
+	decode_r_type(instr);
+	reg_w(op_dest->reg) = cpu.lo;
+	sprintf(assembly, "mflo   %s", REG_NAME(op_dest->reg));
+}
 
 make_helper(add) {
 
@@ -45,19 +70,32 @@ make_helper(slt) {
 
 	decode_r_type(instr);
 	// signed numbers compare
-	int rs = op_src1->val, rt = op_src2->val;
+	int32_t rs = op_src1->val, rt = op_src2->val;
 	reg_w(op_dest->reg) = (rs < rt) ? 1 : 0;
 	sprintf(assembly, "slt   %s,   %s,   %s", REG_NAME(op_dest->reg), REG_NAME(op_src1->reg), REG_NAME(op_src2->reg));
 }
 
-// make_helper(mult) {
+// TODO:carefully
+make_helper(mult) {
 
-// 	decode_r_type(instr);
-// 	// signed numbers multiple
-// 	int rs = op_src1->val, rt = op_src2->val;
-// 	reg_w(op_dest->reg) = (rs < rt) ? 1 : 0;
-// 	sprintf(assembly, "slt   %s,   %s,   %s", REG_NAME(op_dest->reg), REG_NAME(op_src1->reg), REG_NAME(op_src2->reg));
-// }
+	decode_r_type(instr);
+	// signed numbers multiple
+	int64_t rs = op_src1->val, rt = op_src2->val, ans;
+	ans = rs * rt;
+	cpu.lo = ans;
+	cpu.hi = ans >> 32;
+	sprintf(assembly, "mult   %s,   %s", REG_NAME(op_src1->reg), REG_NAME(op_src2->reg));
+}
+
+make_helper(div) {
+
+	decode_r_type(instr);
+	// signed div
+	int32_t rs = op_src1->val, rt = op_src2->val;
+	cpu.lo = rs / rt;
+	cpu.hi = rs % rt;
+	sprintf(assembly, "div   %s,   %s", REG_NAME(op_src1->reg), REG_NAME(op_src2->reg));
+}
 
 make_helper(and) {
 
