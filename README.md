@@ -2,7 +2,7 @@
 本目录用于保存测试程序，并对其进行编译，包含build和src文件夹，convert.c，default.ld， Makefile文件。
 目前测试程序仅支持汇编形式。
 
-目录结构：
+目录结构：  
    +--mips_sc/        		: 测试程序目录  
    |          
    |--temu/			: temu源程序目录  
