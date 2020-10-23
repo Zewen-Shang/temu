@@ -1,6 +1,7 @@
 #include "helper.h"
 #include "all-instr.h"
 
+// 函数指针
 typedef void (*op_fun)(uint32_t);
 static make_helper(_2byte_esc);
 
@@ -47,12 +48,14 @@ op_fun _2byte_opcode_table[64] = {
 	/* 0x38 */ inv, inv, inv, inv,
 	/* 0x3c */ inv, inv, inv, inv};
 
+// I-type
 make_helper(exec) {
 	instr = instr_fetch(pc, 4);
 	ops_decoded.opcode = instr >> 26;
 	opcode_table[ ops_decoded.opcode ](pc);
 }
 
+// R-type
 static make_helper(_2byte_esc) {
 	ops_decoded.func = instr & FUNC_MASK;
 	_2byte_opcode_table[ops_decoded.func](pc); 

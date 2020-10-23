@@ -50,6 +50,8 @@ void cpu_exec(volatile uint32_t n) {
 
 		/* Execute one instruction, including instruction fetch,
 		 * instruction decode, and the actual execution. */
+		
+		// TODO:这个指令是只执行了I型指令，那R型呢？
 		exec(cpu.pc);
 
 		cpu.pc += 4;

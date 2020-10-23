@@ -16,11 +16,12 @@
 (3). 如果需要重新编译和运行temu仿真器源代码，请在TEMU工程根目录下输入“make clean”，然后重复前两步。
 
 3. 罗立伟
-(1). 添加add，考虑溢出异常？
-(2). subu, slt已添加
-(3). mult, sll, mfhi, mflo
-(4). addi(overflow?), addiu(no overflow), simm应该不要写吧？(union?), sltiu, lb, lw(地址不是4的倍数触发错误;已经读了四个字节还怎么符号扩展), offset可以是负数吗？(如果是的话，itype定义offset要改)
-(5). div rs , rt 是rs/rt?
-(6). J型怎么写？
-(7). lh不是2的整数倍会触发错误
+(1). 添加add，考虑溢出异常？  
+(2). subu, slt已添加  
+(3). mult, sll, mfhi, mflo  
+(4). addi(overflow?), addiu(no overflow), simm应该不要写吧？(union?), sltiu, lb, lw(地址不是4的倍数触发错误;已经读了四个字节还怎么符号扩展), offset可以是负数吗？(如果是的话，itype定义offset要改)  
+(5). div rs , rt 是rs/rt?  
+(6). J型怎么写?  
+(7). lh不是2的整数倍会触发错误  
+(8). exec是执行R型，那I型呢？  
 
