@@ -22,4 +22,5 @@
 (4). addi(overflow?), addiu(no overflow), simm应该不要写吧？(union?), sltiu, lb, lw(地址不是4的倍数触发错误;已经读了四个字节还怎么符号扩展), offset可以是负数吗？(如果是的话，itype定义offset要改)
 (5). div rs , rt 是rs/rt?
 (6). J型怎么写？
+(7). lh不是2的整数倍会触发错误
 

@@ -57,6 +57,17 @@ make_helper(addiu) {
 	sprintf(assembly, "addiu   %s,   %s,   0x%04x", REG_NAME(op_dest->reg), REG_NAME(op_src1->reg), op_src2->imm);
 }
 
+make_helper(slti) {
+
+	decode_imm_type(instr);
+	// signed extension
+	int32_t imm = ((op_src2->simm << 16) >> 16);
+	// signed num cmp
+	int32_t rs = op_src1->val;
+	reg_w(op_dest->reg) = rs < imm ? 1 : 0;
+	sprintf(assembly, "slti   %s,   %s,   0x%04x", REG_NAME(op_dest->reg), REG_NAME(op_src1->reg), op_src2->imm);
+}
+
 make_helper(sltiu) {
 
 	decode_imm_type(instr);
@@ -65,6 +76,15 @@ make_helper(sltiu) {
 	// unsigned num cmp
 	reg_w(op_dest->reg) = op_src1->val < imm ? 1 : 0;
 	sprintf(assembly, "sltiu   %s,   %s,   0x%04x", REG_NAME(op_dest->reg), REG_NAME(op_src1->reg), op_src2->imm);
+}
+
+make_helper(andi) {
+
+	decode_imm_type(instr);
+	// unsigned extension
+	uint32_t imm = ((op_src2->val) << 16) >> 16;
+	reg_w(op_dest->reg) = op_src1->val & imm;
+	sprintf(assembly, "andi   %s,   %s,   0x%04x", REG_NAME(op_dest->reg), REG_NAME(op_src1->reg), op_src2->imm);
 }
 
 make_helper(lui) {
@@ -81,12 +101,21 @@ make_helper(ori) {
 	sprintf(assembly, "ori   %s,   %s,   0x%04x", REG_NAME(op_dest->reg), REG_NAME(op_src1->reg), op_src2->imm);
 }
 
+make_helper(xori) {
+
+	decode_imm_type(instr);
+	// unsigned extension
+	uint32_t imm = ((op_src2->val) << 16) >> 16;
+	reg_w(op_dest->reg) = op_src1->val ^ imm;
+	sprintf(assembly, "xori   %s,   %s,   0x%04x", REG_NAME(op_dest->reg), REG_NAME(op_src1->reg), op_src2->imm);
+}
+
 // TODO:expr is right?  0x%04x(%s)
 make_helper(lb) {
 
 	decode_imm_type(instr);
 	// signed extension
-	uint32_t offset = ((op_src2->simm << 16) >> 16);
+	int32_t offset = ((op_src2->simm << 16) >> 16);
 	// memory addr
 	uint32_t addr = op_src1->val + offset;
 	// read memory
@@ -94,6 +123,21 @@ make_helper(lb) {
 	// signed extension
 	reg_w(op_dest->reg) = ((ret << 24) >> 24);
 	sprintf(assembly, "lb   %s,   0x%04x(%s)", REG_NAME(op_dest->reg), op_src2->imm, REG_NAME(op_src1->reg));
+}
+
+// TODO:
+make_helper(lh) {
+
+	decode_imm_type(instr);
+	// signed extension
+	int32_t offset = ((op_src2->simm << 16) >> 16);
+	// memory addr
+	uint32_t addr = op_src1->val + offset;
+	// read memory
+	int32_t ret = mem_read(addr, 2);
+	// signed extension
+	reg_w(op_dest->reg) = ((ret << 16) >> 16);
+	sprintf(assembly, "lh   %s,   0x%04x(%s)", REG_NAME(op_dest->reg), op_src2->imm, REG_NAME(op_src1->reg));
 }
 
 // TODO:
@@ -111,11 +155,39 @@ make_helper(lw) {
 	sprintf(assembly, "lw   %s,   0x%04x(%s)", REG_NAME(op_dest->reg), op_src2->imm, REG_NAME(op_src1->reg));
 }
 
+make_helper(lbu) {
+
+	decode_imm_type(instr);
+	// signed extension
+	int32_t offset = ((op_src2->simm << 16) >> 16);
+	// memory addr
+	uint32_t addr = op_src1->val + offset;
+	// read memory
+	uint32_t ret = mem_read(addr, 1);
+	// unsigned extension
+	reg_w(op_dest->reg) = ((ret << 24) >> 24);
+	sprintf(assembly, "lbu   %s,   0x%04x(%s)", REG_NAME(op_dest->reg), op_src2->imm, REG_NAME(op_src1->reg));
+}
+
+make_helper(lhu) {
+
+	decode_imm_type(instr);
+	// signed extension
+	int32_t offset = ((op_src2->simm << 16) >> 16);
+	// memory addr
+	uint32_t addr = op_src1->val + offset;
+	// read memory
+	uint32_t ret = mem_read(addr, 2);
+	// unsigned extension
+	reg_w(op_dest->reg) = ((ret << 16) >> 16);
+	sprintf(assembly, "lhu   %s,   0x%04x(%s)", REG_NAME(op_dest->reg), op_src2->imm, REG_NAME(op_src1->reg));
+}
+
 make_helper(sb) {
 
 	decode_imm_type(instr);
 	// signed extension
-	uint32_t offset = ((op_src2->simm << 16) >> 16);
+	int32_t offset = ((op_src2->simm << 16) >> 16);
 	// memory addr
 	uint32_t addr = op_src1->val + offset;
 	uint8_t ans = reg_w(op_dest->reg);
@@ -125,11 +197,25 @@ make_helper(sb) {
 	sprintf(assembly, "sb   %s,   0x%04x(%s)", REG_NAME(op_dest->reg), op_src2->imm, REG_NAME(op_src1->reg));
 }
 
+make_helper(sh) {
+
+	decode_imm_type(instr);
+	// signed extension
+	int32_t offset = ((op_src2->simm << 16) >> 16);
+	// memory addr
+	uint32_t addr = op_src1->val + offset;
+	uint8_t ans = reg_w(op_dest->reg);
+	// write memory
+	mem_write(addr, 2, ans);
+	
+	sprintf(assembly, "sh   %s,   0x%04x(%s)", REG_NAME(op_dest->reg), op_src2->imm, REG_NAME(op_src1->reg));
+}
+
 make_helper(sw) {
 
 	decode_imm_type(instr);
 	// signed extension
-	uint32_t offset = ((op_src2->simm << 16) >> 16);
+	int32_t offset = ((op_src2->simm << 16) >> 16);
 	// memory addr
 	uint32_t addr = op_src1->val + offset;
 	uint32_t ans = reg_w(op_dest->reg);

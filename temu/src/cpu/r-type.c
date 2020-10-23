@@ -28,7 +28,42 @@ make_helper(sll) {
 
 	decode_r_type(instr);
 	reg_w(op_dest->reg) = (op_src2->val) << (op_sham->val);
-	sprintf(assembly, "sll   %s,   %s,   0x%04x", REG_NAME(op_dest->reg), REG_NAME(op_src1->reg), op_sham->val);
+	sprintf(assembly, "sll   %s,   %s,   0x%04x", REG_NAME(op_dest->reg), REG_NAME(op_src2->reg), op_sham->val);
+}
+
+make_helper(srl) {
+
+	decode_r_type(instr);
+	reg_w(op_dest->reg) = (op_src2->val) >> (op_sham->val);
+	sprintf(assembly, "srl   %s,   %s,   0x%04x", REG_NAME(op_dest->reg), REG_NAME(op_src2->reg), op_sham->val);
+}
+
+make_helper(sra) {
+
+	decode_r_type(instr);
+	reg_w(op_dest->reg) = (op_src2->simm) >> (op_sham->val);
+	sprintf(assembly, "sra   %s,   %s,   0x%04x", REG_NAME(op_dest->reg), REG_NAME(op_src2->reg), op_sham->val);
+}
+
+make_helper(sllv) {
+
+	decode_r_type(instr);
+	reg_w(op_dest->reg) = (op_src2->val) << (op_src1->val);
+	sprintf(assembly, "sllv   %s,   %s,   %s", REG_NAME(op_dest->reg), REG_NAME(op_src2->reg), REG_NAME(op_src1->reg));
+}
+
+make_helper(srlv) {
+
+	decode_r_type(instr);
+	reg_w(op_dest->reg) = (op_src2->val) >> (op_src1->val);
+	sprintf(assembly, "srlv   %s,   %s,   %s", REG_NAME(op_dest->reg), REG_NAME(op_src2->reg), REG_NAME(op_src1->reg));
+}
+
+make_helper(srav) {
+
+	decode_r_type(instr);
+	reg_w(op_dest->reg) = (op_src2->simm) >> (op_src2->val);
+	sprintf(assembly, "srav   %s,   %s,   %s", REG_NAME(op_dest->reg), REG_NAME(op_src2->reg), REG_NAME(op_src1->reg));
 }
 
 make_helper(jr) {
@@ -45,6 +80,13 @@ make_helper(mfhi) {
 	sprintf(assembly, "mfhi   %s", REG_NAME(op_dest->reg));
 }
 
+make_helper(mthi) {
+
+	decode_r_type(instr);
+	cpu.hi = op_src1->val;
+	sprintf(assembly, "mthi   %s", REG_NAME(op_src1->reg));
+}
+
 make_helper(mflo) {
 
 	decode_r_type(instr);
@@ -52,11 +94,37 @@ make_helper(mflo) {
 	sprintf(assembly, "mflo   %s", REG_NAME(op_dest->reg));
 }
 
+make_helper(mtlo) {
+
+	decode_r_type(instr);
+	cpu.lo = op_src1->val;
+	sprintf(assembly, "mtlo   %s", REG_NAME(op_src1->reg));
+}
+
+// TODO:overflow?
 make_helper(add) {
 
 	decode_r_type(instr);
-	reg_w(op_dest->reg) = (op_src1->val + op_src2->val);
+	int32_t rs = op_src1->val, rt = op_src2->val;
+	reg_w(op_dest->reg) = rs + rt;
 	sprintf(assembly, "add   %s,   %s,   %s", REG_NAME(op_dest->reg), REG_NAME(op_src1->reg), REG_NAME(op_src2->reg));
+}
+
+// TODO:no overflow
+make_helper(addu) {
+
+	decode_r_type(instr);
+	reg_w(op_dest->reg) = (op_src1->val + op_src2->val);
+	sprintf(assembly, "addu   %s,   %s,   %s", REG_NAME(op_dest->reg), REG_NAME(op_src1->reg), REG_NAME(op_src2->reg));
+}
+
+// TODO:overflow?
+make_helper(sub) {
+
+	decode_r_type(instr);
+	int32_t rs = op_src1->val, rt = op_src2->val;
+	reg_w(op_dest->reg) = rs - rt;
+	sprintf(assembly, "sub   %s,   %s,   %s", REG_NAME(op_dest->reg), REG_NAME(op_src1->reg), REG_NAME(op_src2->reg));
 }
 
 make_helper(subu) {
@@ -75,6 +143,14 @@ make_helper(slt) {
 	sprintf(assembly, "slt   %s,   %s,   %s", REG_NAME(op_dest->reg), REG_NAME(op_src1->reg), REG_NAME(op_src2->reg));
 }
 
+make_helper(sltu) {
+
+	decode_r_type(instr);
+	// unsigned numbers compare
+	reg_w(op_dest->reg) = (op_src1->val < op_src2->val) ? 1 : 0;
+	sprintf(assembly, "sltu   %s,   %s,   %s", REG_NAME(op_dest->reg), REG_NAME(op_src1->reg), REG_NAME(op_src2->reg));
+}
+
 // TODO:carefully
 make_helper(mult) {
 
@@ -85,6 +161,16 @@ make_helper(mult) {
 	cpu.lo = ans;
 	cpu.hi = ans >> 32;
 	sprintf(assembly, "mult   %s,   %s", REG_NAME(op_src1->reg), REG_NAME(op_src2->reg));
+}
+
+make_helper(multu) {
+
+	decode_r_type(instr);
+	// unsigned numbers multiple
+	uint64_t ans = op_src1->val * op_src2->val;
+	cpu.lo = ans;
+	cpu.hi = ans >> 32;
+	sprintf(assembly, "multu   %s,   %s", REG_NAME(op_src1->reg), REG_NAME(op_src2->reg));
 }
 
 make_helper(div) {
